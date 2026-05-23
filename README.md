@@ -43,7 +43,7 @@
 ## 🏗️ 系统架构
 ```
 <div align="center">
-<img src="./images/image1.png" width="700"><br>
+<img src="./images/image3.png" width="700"><br>
 <em>图3：系统架构</em>
 </div>
 ```
