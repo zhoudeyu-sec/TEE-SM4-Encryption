@@ -100,32 +100,32 @@ TEE-SM4-Encryption/
 ---
 
 ## 🔧 环境要求
-
 | 组件 | 要求 |
 |------|------|
 | **硬件** | 飞腾派开发板（FT2000/4，支持 ARM TrustZone） |
 | **宿主机** | Windows 11 + VirtualBox |
-| **虚拟机** | Ubuntu 22.04（已配置 OP-TEE 环境） |
-| **连接方式** | XShell（SSH） + 共享文件夹 |
-| **交叉编译** | arm-linux-gnueabihf-gcc |
-| **飞腾派系统** | Debian / Ubuntu（支持 `libteec`） |
+| **虚拟机** | Ubuntu 22.04（预装 OP-TEE 编译环境） |
+| **连接方式** | XShell SSH 远程连接 + 共享文件夹文件交互 |
+| **交叉编译工具** | arm-linux-gnueabihf-gcc |
+| **设备系统** | Debian/Ubuntu，预装 libteec 运行库 |
+
 ---
 
 ## 🚀 快速开始
-### 1. 编译 TA（在 OP-TEE 开发环境中）
+### 1. 编译 TA（OP-TEE 虚拟机环境）
 ```bash
 export TA_DEV_KIT_DIR=~/optee_os/out/arm-plat-vexpress/export-ta_arm32
 export CROSS_COMPILE=arm-linux-gnueabihf-
 cd ta && make clean && make
 ```
 
-### 2. 编译 CA（在飞腾派上）
+### 2. 编译 CA（飞腾派设备端）
 ```bash
 cd host
 gcc ca_crypto.c -o ca_crypto -lteec
 ```
 
-### 3. 部署运行
+### 3. 部署运行程序
 ```bash
 sudo cp 9b1deb4d-3b7d-4bad-9bdd-2b0d7b3dcb6d.ta /lib/optee_armtz/
 ./ca_crypto
@@ -161,23 +161,23 @@ sudo cp 9b1deb4d-3b7d-4bad-9bdd-2b0d7b3dcb6d.ta /lib/optee_armtz/
 ---
 
 ## 🔒 安全验证
-### 1. 源码密钥检查
+### 1. 源码密钥检索检查
 ```bash
 grep -r "key\|secret" .
 ```
-**预期**：无硬编码密钥
+**预期结果**：无硬编码密钥数值泄露
 
-### 2. 二进制密钥检查
+### 2. 二进制程序密钥检查
 ```bash
 strings *.ta | grep -iE "[0-9a-f]{32,}"
 ```
-**预期**：无密钥信息
+**预期结果**：无有效密钥明文信息
 
-### 3. 运行时内存检查
+### 3. 进程内存密钥排查
 ```bash
 sudo strings /proc/$(pidof ca_crypto)/mem | grep -iE "key|secret"
 ```
-**预期**：无密钥泄露
+**预期结果**：内存中不存在密钥明文
 
 <div align="center">
 <img src="./images/image2.png" width="700"><br>
@@ -189,45 +189,40 @@ sudo strings /proc/$(pidof ca_crypto)/mem | grep -iE "key|secret"
 ## 📊 技术栈
 | 技术 | 说明 |
 |------|------|
-| **OP-TEE** | 开源 TEE 框架 |
-| **SM4** | 国密对称加密算法 |
-| **ARM TrustZone** | 硬件隔离 |
-| **TEEC** | REE ↔ TEE 通信接口 |
-| **C语言** | 开发语言 |
+| **OP-TEE** | 开源可信执行环境框架 |
+| **SM4** | 国密对称分组加密算法 |
+| **ARM TrustZone** | 硬件级安全隔离技术 |
+| **TEEC** | 普通世界与安全世界通信接口 |
+| **C语言** | TA、CA 业务开发语言 |
 
 ---
 
 ## 📝 接口说明
-### TA 命令 ID
-| 命令 | 值 | 说明 |
-|------|-----|------|
-| `CMD_GEN_KEY` | 1 | 生成密钥 |
-| `CMD_ENCRYPT` | 2 | SM4 加密 |
-| `CMD_DECRYPT` | 3 | SM4 解密 |
+### TA 命令定义
+| 命令 | 取值 | 功能说明 |
+|------|------|----------|
+| `CMD_GEN_KEY` | 1 | 生成并持久化存储 SM4 密钥 |
+| `CMD_ENCRYPT` | 2 | 调用 SM4 算法加密数据 |
+| `CMD_DECRYPT` | 3 | 调用 SM4 算法还原解密数据 |
 
 ---
 
 ## 👥 团队信息
-
 **课题名称**：基于 TEE 隔离环境密码接口实现
-
 **所属课程**：信息安全项目实训
 
-**团队成员**：
-
-| 成员  | 主要贡献 |
+| 成员 | 主要贡献 |
 |------|----------|
-| 成员A |TA 开发、密钥生成、SM4 加密/解密 |
-| 成员B |CA 开发、TEE 接口调用、用户交互 |
-| 成员C |环境搭建、功能测试、安全验证 |
-| 成员D |文档撰写、PPT、代码注释 |
+| 成员A | TA 开发、密钥生成、SM4 加密解密逻辑 |
+| 成员B | CA 开发、TEE 接口调用、人机交互编写 |
+| 成员C | 软硬件环境搭建、功能联调、安全测试验证 |
+| 成员D | 项目文档撰写、汇报PPT制作、代码注释优化 |
 
 **完成时间**：2026年5月
 
 ---
 
 ## 📄 License
-
 MIT
 
 ---
