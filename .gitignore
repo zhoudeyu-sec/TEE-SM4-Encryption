@@ -1,0 +1,5 @@
+*.ta
+*.elf
+*.o
+ca_crypto
+build/
